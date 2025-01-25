@@ -1,15 +1,14 @@
+from typing import Optional, List
+from uuid import UUID, uuid4
+from pydantic import BaseModel, EmailStr, Field
+from enum import Enum
 import uuid
-
-from pydantic import EmailStr
-from sqlmodel import Field, Relationship, SQLModel
-
-
 # Shared properties
-class UserBase(SQLModel):
-    email: EmailStr = Field(unique=True, index=True, max_length=255)
+class UserBase(BaseModel):
+    email: EmailStr = Field(unique=True, max_length=255)
     is_active: bool = True
     is_superuser: bool = False
-    full_name: str | None = Field(default=None, max_length=255)
+    full_name: Optional[str] = Field(default=None, max_length=255)
 
 
 # Properties to receive via API on creation
@@ -17,49 +16,64 @@ class UserCreate(UserBase):
     password: str = Field(min_length=8, max_length=40)
 
 
-class UserRegister(SQLModel):
+class UserRegister(BaseModel):
     email: EmailStr = Field(max_length=255)
     password: str = Field(min_length=8, max_length=40)
-    full_name: str | None = Field(default=None, max_length=255)
+    full_name: Optional[str] = Field(default=None, max_length=255)
 
 
 # Properties to receive via API on update, all are optional
-class UserUpdate(UserBase):
-    email: EmailStr | None = Field(default=None, max_length=255)  # type: ignore
-    password: str | None = Field(default=None, min_length=8, max_length=40)
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = Field(default=None, max_length=255)
+    password: Optional[str] = Field(default=None, min_length=8, max_length=40)
+    is_active: Optional[bool] = None
+    is_superuser: Optional[bool] = None
+    full_name: Optional[str] = Field(default=None, max_length=255)
 
 
-class UserUpdateMe(SQLModel):
-    full_name: str | None = Field(default=None, max_length=255)
-    email: EmailStr | None = Field(default=None, max_length=255)
+class UserUpdateMe(BaseModel):
+    full_name: Optional[str] = Field(default=None, max_length=255)
+    email: Optional[EmailStr] = Field(default=None, max_length=255)
 
 
-class UpdatePassword(SQLModel):
+class UpdatePassword(BaseModel):
     current_password: str = Field(min_length=8, max_length=40)
     new_password: str = Field(min_length=8, max_length=40)
 
 
-# Database model, database table inferred from class name
-class User(UserBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+# Database model representation (if needed)
+class User(UserBase):
+    id: UUID = Field(default_factory=uuid4)
     hashed_password: str
-    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    items: List['Item'] = []
 
 
 # Properties to return via API, id is always required
 class UserPublic(UserBase):
-    id: uuid.UUID
+    id: UUID
 
 
-class UsersPublic(SQLModel):
-    data: list[UserPublic]
+class UsersPublic(BaseModel):
+    data: List[UserPublic]
     count: int
 
+from enum import Enum
 
-# Shared properties
-class ItemBase(SQLModel):
+class TaskOutcome(str, Enum):
+   PASS = "pass"
+   FAIL = "fail"
+   PENDING = "pending"
+
+
+class TaskModel(BaseModel):
     title: str = Field(min_length=1, max_length=255)
-    description: str | None = Field(default=None, max_length=255)
+    description: Optional[str] = Field(default=None, max_length=255)
+    id: uuid.UUID
+    status: TaskOutcome
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: Optional[datetime] = Field(default=None)
+   
+
 
 
 # Properties to receive on item creation
@@ -68,47 +82,44 @@ class ItemCreate(ItemBase):
 
 
 # Properties to receive on item update
-class ItemUpdate(ItemBase):
-    title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+class ItemUpdate(BaseModel):
+    title: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    description: Optional[str] = Field(default=None, max_length=255)
 
 
-# Database model, database table inferred from class name
-class Item(ItemBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    title: str = Field(max_length=255)
-    owner_id: uuid.UUID = Field(
-        foreign_key="user.id", nullable=False, ondelete="CASCADE"
-    )
-    owner: User | None = Relationship(back_populates="items")
+# Database model representation (if needed)
+class Item(ItemBase):
+    id: UUID = Field(default_factory=uuid4)
+    owner_id: UUID
 
 
 # Properties to return via API, id is always required
 class ItemPublic(ItemBase):
-    id: uuid.UUID
-    owner_id: uuid.UUID
+    id: UUID
+    owner_id: UUID
 
 
-class ItemsPublic(SQLModel):
-    data: list[ItemPublic]
+class ItemsPublic(BaseModel):
+    data: List[ItemPublic]
     count: int
 
 
 # Generic message
-class Message(SQLModel):
+class Message(BaseModel):
     message: str
 
 
 # JSON payload containing access token
-class Token(SQLModel):
+class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
 
 # Contents of JWT token
-class TokenPayload(SQLModel):
-    sub: str | None = None
+class TokenPayload(BaseModel):
+    sub: Optional[str] = None
 
 
-class NewPassword(SQLModel):
+class NewPassword(BaseModel):
     token: str
     new_password: str = Field(min_length=8, max_length=40)
