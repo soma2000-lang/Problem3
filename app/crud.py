@@ -2,10 +2,9 @@ import uuid
 from typing import Any
 
 from sqlmodel import Session, select
-
+from fastapi import HTTPException
 from app.core.security import get_password_hash, verify_password
-from app.models import Item, ItemCreate, User, UserCreate, UserUpdate
-
+from app.models import User, UserCreate, UserUpdate, TaskModel,TaskCreate,TaskUpdate,TaskResponse
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
     db_obj = User.model_validate(
@@ -46,9 +45,38 @@ def authenticate(*, session: Session, email: str, password: str) -> User | None:
     return db_user
 
 
-def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -> Item:
-    db_item = Item.model_validate(item_in, update={"owner_id": owner_id})
+def create_task(*, session: Session, item_in: TaskCreate, owner_id: uuid.UUID) -> TaskResponse:
+    db_item = TaskModel.model_validate(item_in, update={"owner_id": owner_id})
     session.add(db_item)
     session.commit()
     session.refresh(db_item)
     return db_item
+
+def update_task(*, session: Session, db_task: TaskModel, task_update: TaskUpdate)->TaskResponse:
+ 
+    if db_task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    update_data = task_update.model_dump(exclude_unset=True)
+    
+    for key, value in update_data.items():
+        setattr(db_task, key, value)
+    
+    session.commit()
+    session.refresh(db_task)
+    return db_task
+
+def read_task(*, session: Session, task_id: int) -> TaskModel:
+    db_task = session.query(TaskModel).filter(TaskModel.id == task_id).first()
+    
+    if db_task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    return db_task
+
+def delete_task(*, session: Session, db_task: TaskModel):
+    if db_task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    session.delete(db_task)
+    session.commit()
+    return {"detail": "Task successfully deleted"}

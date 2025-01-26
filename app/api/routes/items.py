@@ -5,105 +5,105 @@ from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
 
 from app.api.deps import CurrentUser, SessionDep
-from app.models import Item, ItemCreate, ItemPublic, ItemsPublic, ItemUpdate, Message
+from app.models import TaskModel,TaskCreate,TaskUpdate,TaskResponse,Message
 
-router = APIRouter(prefix="/items", tags=["items"])
+router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
-@router.get("/", response_model=ItemsPublic)
-def read_items(
+@router.get("/", response_model=TaskResponse)
+def read_tasks(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """
-    Retrieve items.
+    Retrieve tasks.
     """
 
     if current_user.is_superuser:
-        count_statement = select(func.count()).select_from(Item)
+        count_statement = select(func.count()).select_from(TaskModel)
         count = session.exec(count_statement).one()
-        statement = select(Item).offset(skip).limit(limit)
-        items = session.exec(statement).all()
+        statement = select(TaskModel).offset(skip).limit(limit)
+        tasks = session.exec(statement).all()
     else:
         count_statement = (
             select(func.count())
-            .select_from(Item)
-            .where(Item.owner_id == current_user.id)
+            .select_from(TaskModel)
+            .where(TaskModel.id == current_user.id)
         )
         count = session.exec(count_statement).one()
         statement = (
-            select(Item)
-            .where(Item.owner_id == current_user.id)
+            select(TaskModel)
+            .where(TaskModel.id == current_user.id)
             .offset(skip)
             .limit(limit)
         )
-        items = session.exec(statement).all()
+        tasks = session.exec(statement).all()
 
-    return ItemsPublic(data=items, count=count)
+    return TaskModel(data=tasks, count=count)
 
 
-@router.get("/{id}", response_model=ItemPublic)
-def read_item(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Any:
+@router.get("/{id}", response_model=TaskResponse)
+def read_task(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Any:
     """
-    Get item by ID.
+    Get task by ID.
     """
-    item = session.get(Item, id)
-    if not item:
+    task = session.get(TaskModel, id)
+    if not task:
         raise HTTPException(status_code=404, detail="Item not found")
-    if not current_user.is_superuser and (item.owner_id != current_user.id):
+    if not current_user.is_superuser and (task.id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    return item
+    return task
 
 
-@router.post("/", response_model=ItemPublic)
-def create_item(
-    *, session: SessionDep, current_user: CurrentUser, item_in: ItemCreate
+@router.post("/", response_model=TaskResponse)
+def create_task(
+    *, session: SessionDep, current_user: CurrentUser, task_in: TaskCreate
 ) -> Any:
     """
-    Create new item.
+    Create new task.
     """
-    item = Item.model_validate(item_in, update={"owner_id": current_user.id})
-    session.add(item)
+    task = TaskResponse.model_validate(task_in, update={"owner_id": current_user.id})
+    session.add(task)
     session.commit()
-    session.refresh(item)
-    return item
+    session.refresh(task)
+    return task
 
 
-@router.put("/{id}", response_model=ItemPublic)
-def update_item(
+@router.put("/{id}", response_model=TaskResponse)
+def update_task(
     *,
     session: SessionDep,
     current_user: CurrentUser,
     id: uuid.UUID,
-    item_in: ItemUpdate,
+    task_in: TaskUpdate,
 ) -> Any:
     """
-    Update an item.
+    Update an task.
     """
-    item = session.get(Item, id)
-    if not item:
+    task = session.get(TaskModel, id)
+    if not task:
         raise HTTPException(status_code=404, detail="Item not found")
-    if not current_user.is_superuser and (item.owner_id != current_user.id):
+    if not current_user.is_superuser and (task.id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    update_dict = item_in.model_dump(exclude_unset=True)
-    item.sqlmodel_update(update_dict)
-    session.add(item)
+    update_dict = task_in.model_dump(exclude_unset=True)
+    task.sqlmodel_update(update_dict)
+    session.add(task)
     session.commit()
-    session.refresh(item)
-    return item
+    session.refresh(task)
+    return task
 
 
 @router.delete("/{id}")
-def delete_item(
+def delete_task(
     session: SessionDep, current_user: CurrentUser, id: uuid.UUID
 ) -> Message:
     """
-    Delete an item.
+    Delete an task.
     """
-    item = session.get(Item, id)
-    if not item:
+    task = session.get(TaskModel, id)
+    if not task:
         raise HTTPException(status_code=404, detail="Item not found")
-    if not current_user.is_superuser and (item.owner_id != current_user.id):
+    if not current_user.is_superuser and (task.id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    session.delete(item)
+    session.delete(task)
     session.commit()
     return Message(message="Item deleted successfully")

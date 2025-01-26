@@ -66,47 +66,35 @@ class TaskOutcome(str, Enum):
 
 
 class TaskModel(BaseModel):
+    title: str = Field(min_length=1, max_length=100)
+    description: Optional[str] = Field(default=None, max_length=255)
+    id: uuid.UUID
+    status: TaskOutcome
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: Optional[datetime] = Field(default=None)
+
+class TaskCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=100)
+    description: Optional[str] = Field(default=None, max_length=255)
+
+
+class TaskUpdate(BaseModel):
+    title: str = Field(min_length=1, max_length=100)
+    description: Optional[str] = Field(default=None, max_length=255)
+    status: TaskOutcome
+
+
+
+
+# Generic message
+class TaskResponse(BaseModel):
     title: str = Field(min_length=1, max_length=255)
     description: Optional[str] = Field(default=None, max_length=255)
     id: uuid.UUID
     status: TaskOutcome
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = Field(default=None)
-   
 
-
-
-# Properties to receive on item creation
-class ItemCreate(ItemBase):
-    pass
-
-
-# Properties to receive on item update
-class ItemUpdate(BaseModel):
-    title: Optional[str] = Field(default=None, min_length=1, max_length=255)
-    description: Optional[str] = Field(default=None, max_length=255)
-
-
-# Database model representation (if needed)
-class Item(ItemBase):
-    id: UUID = Field(default_factory=uuid4)
-    owner_id: UUID
-
-
-# Properties to return via API, id is always required
-class ItemPublic(ItemBase):
-    id: UUID
-    owner_id: UUID
-
-
-class ItemsPublic(BaseModel):
-    data: List[ItemPublic]
-    count: int
-
-
-# Generic message
-class Message(BaseModel):
-    message: str
 
 
 # JSON payload containing access token
