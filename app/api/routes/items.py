@@ -1,12 +1,14 @@
 import uuid
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException,Depends, Query
 from sqlmodel import func, select
-
+from typing import Optional
 from app.api.deps import CurrentUser, SessionDep
-from app.models import TaskModel,TaskCreate,TaskUpdate,TaskResponse,Message
-
+from fastapi import Message
+from app.models import User, UserCreate, UserUpdate, TaskModel,TaskCreate,TaskUpdate,TaskResponse,PaginatedTaskResponse, TaskOutcome
+from fastapi_pagination import Page, paginate
+from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
@@ -107,3 +109,29 @@ def delete_task(
     session.delete(task)
     session.commit()
     return Message(message="Item deleted successfully")
+@router.get("/tasks/", response_model=PaginatedTaskResponse)
+def list_tasks(
+    session: SessionDep,
+    status: Optional[str] = Query(None, description="Filter tasks by status"),
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(10, ge=1, le=100, description="Number of tasks per page")
+):
+    query = select(TaskModel)
+    
+
+    if status:
+        query = query.filter(TaskModel.status == status)
+    
+    
+    total_tasks = session.scalar(select(func.count()).select_from(query.subquery()))
+
+    paginated_tasks = sqlalchemy_paginate(session, query, page, page_size)
+    
+    return PaginatedTaskResponse(
+        total_tasks=total_tasks,
+        page=page,
+        page_size=page_size,
+        tasks=[
+            TaskResponse.model_validate(task) for task in paginated_tasks.items
+        ]
+    )

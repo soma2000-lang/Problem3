@@ -3,6 +3,7 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, EmailStr, Field
 from enum import Enum
 import uuid
+import datetime
 # Shared properties
 class UserBase(BaseModel):
     email: EmailStr = Field(unique=True, max_length=255)
@@ -45,7 +46,7 @@ class UpdatePassword(BaseModel):
 class User(UserBase):
     id: UUID = Field(default_factory=uuid4)
     hashed_password: str
-    items: List['Item'] = []
+    items: List['TaskModel'] = []
 
 
 # Properties to return via API, id is always required
@@ -94,6 +95,11 @@ class TaskResponse(BaseModel):
     status: TaskOutcome
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = Field(default=None)
+class PaginatedTaskResponse(BaseModel):
+    total_tasks: int = Field(..., description="Total number of tasks")
+    page: int = Field(..., description="Current page number")
+    page_size: int = Field(..., description="Number of tasks per page")
+    tasks: List[TaskResponse] = Field(..., description="List of tasks for current page")
 
 
 

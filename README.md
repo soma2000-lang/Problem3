@@ -143,3 +143,5 @@ Automatic Interactive Docs (Swagger UI): http://localhost:8000/docs
 ```bash
 pip install fastapi-pagination
 ```
+
+so repository pattern has een used to solve this

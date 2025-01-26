@@ -1,10 +1,12 @@
 import uuid
 from typing import Any
-
-from sqlmodel import Session, select
+from typing import Optional
+from sqlmodel import Session, select,func
 from fastapi import HTTPException
 from app.core.security import get_password_hash, verify_password
-from app.models import User, UserCreate, UserUpdate, TaskModel,TaskCreate,TaskUpdate,TaskResponse
+from app.models import User, UserCreate, UserUpdate, TaskModel,TaskCreate,TaskUpdate,TaskResponse,PaginatedTaskResponse, TaskOutcome
+from fastapi_pagination import Page
+import datetime
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
     db_obj = User.model_validate(
@@ -80,3 +82,29 @@ def delete_task(*, session: Session, db_task: TaskModel):
     session.delete(db_task)
     session.commit()
     return {"detail": "Task successfully deleted"}
+
+def list_tasks(
+    *,
+    session: Session, 
+    status: Optional[TaskOutcome] = None, 
+    page: int = 1, 
+    page_size: int = 10
+) -> PaginatedTaskResponse:
+    query = select(TaskModel)
+
+    if status is not None:
+        query = query.where(TaskModel.status == status)
+
+    total_tasks = session.scalar(select(func.count()).select_from(query.subquery()))
+    
+    offset = (page - 1) * page_size
+    tasks = session.exec(query.offset(offset).limit(page_size)).all()
+    
+    return PaginatedTaskResponse(
+        total_tasks=total_tasks,
+        page=page,
+        page_size=page_size,
+        tasks=[
+            TaskResponse.model_validate(task) for task in tasks
+        ]
+    )
