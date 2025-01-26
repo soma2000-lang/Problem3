@@ -4,7 +4,7 @@ from pydantic import BaseModel, EmailStr, Field
 from enum import Enum
 import uuid
 import datetime
-# Shared properties
+
 class UserBase(BaseModel):
     email: EmailStr = Field(unique=True, max_length=255)
     is_active: bool = True
@@ -12,7 +12,7 @@ class UserBase(BaseModel):
     full_name: Optional[str] = Field(default=None, max_length=255)
 
 
-# Properties to receive via API on creation
+
 class UserCreate(UserBase):
     password: str = Field(min_length=8, max_length=40)
 
