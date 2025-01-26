@@ -68,7 +68,7 @@ def update_task(*, session: Session, db_task: TaskModel, task_update: TaskUpdate
     return db_task
 
 def read_task(*, session: Session, task_id: int) -> TaskModel:
-    db_task = session.query(TaskModel).filter(TaskModel.id == task_id).first()
+    db_task = session.exec(TaskModel).filter(TaskModel.id == task_id).first()
     
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found")
