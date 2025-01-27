@@ -5,14 +5,14 @@
 * [Docker](https://www.docker.com/).
 * [Poetry](https://python-poetry.org/) for Python package and environment management.
 
-The tech stack used
+
 ## Technology Stack and Features
 
-- ⚡ [**FastAPI**](https://fastapi.tiangolo.com) for the Python backend API.
+- ⚡
     - 🧰 [SQLModel](https://sqlmodel.tiangolo.com) for the Python SQL database interactions (ORM).
     - 🔍 [Pydantic](https://docs.pydantic.dev), used by FastAPI, for the data validation and settings management.
     - 💾 [PostgreSQL](https://www.postgresql.org) as the SQL database.
-     🐋 [Docker Compose](https://www.docker.com) for development and production.
+     🐋 [Docker](https://www.docker.com) for development and production.
     - 🔒 Secure password hashing by default.
     - 🔑 JWT (JSON Web Token) authentication.
     - 📫 Email based password recovery.
@@ -80,19 +80,9 @@ PROBLEM3/
 └── tests-start.sh
 ![alt text](image-1.png)
  
- the formatting has been done in rust
-# all the required code has been written in
 
 
-## Docker Compose
-
-* Start the local stack with Docker Compose:
-
-```bash
-docker compose watch
-```
-
-* Now you can open your browser and interact with these URLs:
+##  I have tried to write the tests for each and every feature implemented 
 
 Frontend, built with Docker, with routes handled based on the path: http://localhost:5173
 
@@ -102,21 +92,8 @@ Automatic interactive documentation with Swagger UI (from the OpenAPI backend): 
 
 Adminer, database web administration: http://localhost:8080
 
-Traefik UI, to see how the routes are being handled by the proxy: http://localhost:8090
 
-**Note**: The first time you start your stack, it might take a minute for it to be ready. While the backend waits for the database to be ready and configures everything. You can check the logs to monitor it.
 
-To check the logs, run (in another terminal):
-
-```bash
-docker compose logs
-```
-
-To check the logs of a specific service, add the name of the service, e.g.:
-
-```bash
-docker compose logs backend
-```
 
 ## Local Development
 
@@ -126,13 +103,6 @@ The Docker Compose files are configured so that each of the services is availabl
 This way, you could turn off a Docker Compose service and start its local development service, and everything would keep working, because it all uses the same ports.
 
 
-```
-
-Or you could stop the `backend` Docker Compose service:
-
-```bash
-docker compose stop backend
-```
 
 And then you can run the local development server for the backend:
 
@@ -144,19 +114,6 @@ fastapi dev app/main.py
 
 ## Docker Compose files and env vars
 
-There is a main `docker-compose.yml` file with all the configurations that apply to the whole stack, it is used automatically by `docker compose`.
-
-And there's also a `docker-compose.override.yml` with overrides for development, for example to mount the source code as a volume. It is used automatically by `docker compose` to apply overrides on top of `docker-compose.yml`.
-
-These Docker Compose files use the `.env` file containing configurations to be injected as environment variables in the containers.
-
-They also use some additional configurations taken from environment variables set in the scripts before calling the `docker compose` command.
-
-After changing variables, make sure you restart the stack:
-
-```bash
-docker compose watch
-```
 
 ## The .env file
 
@@ -212,6 +169,8 @@ eslint...................................................................Passed
 prettier.................................................................Passed
 ```
 
+
+
 ## URLs
 
 The production or staging URLs would use these same paths, but with your own domain.
@@ -224,8 +183,5 @@ Backend: http://localhost:8000
 
 Automatic Interactive Docs (Swagger UI): http://localhost:8000/docs
 
-```bash
-pip install fastapi-pagination
-```
 
 so repository pattern has een used to solve this

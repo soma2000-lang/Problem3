@@ -1,4 +1,8 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
+FROM python:3.12-slim-bookworm
+
+# Set environment variables
+ENV PYTHONUNBUFFERED 1
+
 
 WORKDIR /app/
 

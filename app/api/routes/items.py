@@ -8,7 +8,7 @@ from app.api.deps import CurrentUser, SessionDep
 
 from datetime import datetime
 from app.models import User, UserCreate, UserUpdate, TaskModel,TaskCreate,TaskUpdate,TaskResponse,PaginatedTaskResponse, TaskOutcome,TaskPriority, PriorityLevel
-from fastapi_pagination import Page, paginate
+
 from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
