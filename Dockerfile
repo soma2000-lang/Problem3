@@ -23,7 +23,6 @@ ENV PYTHONPATH=/app
 
 COPY ./scripts/ /app/
 
-COPY ./alembic.ini /app/
 
 COPY ./prestart.sh /app/
 
