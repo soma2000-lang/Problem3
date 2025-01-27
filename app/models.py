@@ -3,7 +3,7 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, EmailStr, Field
 from enum import Enum
 import uuid
-import datetime
+from datetime import datetime
 
 class UserBase(BaseModel):
     email: EmailStr = Field(unique=True, max_length=255)
@@ -95,6 +95,7 @@ class TaskResponse(BaseModel):
     status: TaskOutcome
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = Field(default=None)
+
 class PaginatedTaskResponse(BaseModel):
     total_tasks: int = Field(..., description="Total number of tasks")
     page: int = Field(..., description="Current page number")
@@ -103,7 +104,6 @@ class PaginatedTaskResponse(BaseModel):
 
 
 
-# JSON payload containing access token
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
@@ -117,3 +117,16 @@ class TokenPayload(BaseModel):
 class NewPassword(BaseModel):
     token: str
     new_password: str = Field(min_length=8, max_length=40)
+
+# the below model has been done optionally to implement task priority
+
+class PriorityLevel(str, Enum):
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+
+class TaskPriority(TaskModel):
+  
+    priority: PriorityLevel = Field(default=PriorityLevel.MEDIUM)
+    class Config:
+        from_attributes = True

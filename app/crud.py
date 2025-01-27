@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from app.core.security import get_password_hash, verify_password
 from app.models import User, UserCreate, UserUpdate, TaskModel,TaskCreate,TaskUpdate,TaskResponse,PaginatedTaskResponse, TaskOutcome
 from fastapi_pagination import Page
-import datetime
+
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
     db_obj = User.model_validate(

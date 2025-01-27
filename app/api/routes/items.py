@@ -1,12 +1,13 @@
 import uuid
-from typing import Any
+from typing import Any, List
 
 from fastapi import APIRouter, HTTPException,Depends, Query
-from sqlmodel import func, select
+from sqlmodel import func, select,Session
 from typing import Optional
 from app.api.deps import CurrentUser, SessionDep
 from fastapi import Message
-from app.models import User, UserCreate, UserUpdate, TaskModel,TaskCreate,TaskUpdate,TaskResponse,PaginatedTaskResponse, TaskOutcome
+from datetime import datetime
+from app.models import User, UserCreate, UserUpdate, TaskModel,TaskCreate,TaskUpdate,TaskResponse,PaginatedTaskResponse, TaskOutcome,TaskPriority, PriorityLevel
 from fastapi_pagination import Page, paginate
 from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
 router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -135,3 +136,32 @@ def list_tasks(
             TaskResponse.model_validate(task) for task in paginated_tasks.items
         ]
     )
+@router.patch("/tasks/{task_id}/priority", response_model=[TaskPriority])
+async def update_task_priority(
+    task_id: uuid.UUID,
+    priority: PriorityLevel = Query(...)
+):
+    task = task.get(task_id)
+    task.priority = priority
+    task.updated_at = datetime.now()
+    return task
+
+@router.get("/tasks/priority/{priority_level}", response_model=List[TaskPriority])
+async def get_tasks_by_priority(
+    priority_level: PriorityLevel,
+    status: Optional[TaskOutcome] = Query(None)
+):
+
+    
+    query = select(TaskPriority)
+    
+    
+    
+    tasks = query.filter(TaskPriority.priority ==  priority_level)
+    filtered_tasks = [
+        task for task in tasks.values()
+        if task.priority == priority_level
+        
+    ]
+    return sorted(filtered_tasks, key=lambda x: x.created_at)
+
