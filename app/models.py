@@ -4,6 +4,7 @@ from pydantic import BaseModel, EmailStr, Field
 from enum import Enum
 import uuid
 from datetime import datetime
+from sqlmodel import Field, SQLModel
 
 class UserBase(BaseModel):
     email: EmailStr = Field(unique=True, max_length=255)
@@ -112,6 +113,8 @@ class Token(BaseModel):
 # Contents of JWT token
 class TokenPayload(BaseModel):
     sub: Optional[str] = None
+class Message(SQLModel):
+    message: str
 
 
 class NewPassword(BaseModel):

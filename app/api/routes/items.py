@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException,Depends, Query
 from sqlmodel import func, select,Session
 from typing import Optional
 from app.api.deps import CurrentUser, SessionDep
-from fastapi import Message
+
 from datetime import datetime
 from app.models import User, UserCreate, UserUpdate, TaskModel,TaskCreate,TaskUpdate,TaskResponse,PaginatedTaskResponse, TaskOutcome,TaskPriority, PriorityLevel
 from fastapi_pagination import Page, paginate
@@ -98,7 +98,7 @@ def update_task(
 @router.delete("/{id}")
 def delete_task(
     session: SessionDep, current_user: CurrentUser, id: uuid.UUID
-) -> Message:
+):
     """
     Delete an task.
     """
@@ -109,7 +109,7 @@ def delete_task(
         raise HTTPException(status_code=400, detail="Not enough permissions")
     session.delete(task)
     session.commit()
-    return Message(message="Item deleted successfully")
+    return "Item deleted successfully"
 @router.get("/tasks/", response_model=PaginatedTaskResponse)
 def list_tasks(
     session: SessionDep,

@@ -12,5 +12,5 @@ def create_random_task(db: Session) -> TaskCreate:
     assert owner_id is not None
     title = random_lower_string()
     description = random_lower_string()
-    item_in = TaskCreate(title=title, description=description)
+    item_in = TaskModel(title=title, description=description)
     return crud.create_task(session=db, item_in=item_in, owner_id=owner_id)
