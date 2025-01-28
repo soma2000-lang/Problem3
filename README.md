@@ -175,6 +175,9 @@ Automatic Interactive Docs (Swagger UI): http://localhost:8000/docs
 10. Usage of health.py to detect  if the database of the app is going down or not
 
 
+# Scope of Improvement 
+1.The tests writing are still under progress and have not been fully implemened for all the features due to time constaints
 
-## Scope of Improvement 
-The tests writing are still under progress and have not been fully implemened for all the features due to time constaints
+2. Optimise fastapi because sometimes usage of Pydantic makes it slow
+3. Usage of internalization
+4. Usage of Albemic for change managemnt scripts along with SQL alchemy
