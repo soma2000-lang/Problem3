@@ -1,14 +1,14 @@
-# FastAPI Project - Development
-
 ## Requirements
 
 * [Docker](https://www.docker.com/).
 * [Poetry](https://python-poetry.org/) for Python package and environment management.
 
 
+
+The tech stack used
 ## Technology Stack and Features
 
-- ⚡
+- 
     - 🧰 [SQLModel](https://sqlmodel.tiangolo.com) for the Python SQL database interactions (ORM).
     - 🔍 [Pydantic](https://docs.pydantic.dev), used by FastAPI, for the data validation and settings management.
     - 💾 [PostgreSQL](https://www.postgresql.org) as the SQL database.
@@ -20,15 +20,8 @@
 Performm all the features as aked in the problem statement.
 
 
-Additinal features that have been implemented- prioritisation of the tasks according to the priority level set in the models file
 
-
-Task proritization based on class PriorityLevel(str, Enum):
-    HIGH = "high"
-    MEDIUM = "medium"
-    LOW = "low"
-
-    The folder structure looks like this-
+The folder structure looks like this-
 T![alt text](image.png)
 
 
@@ -41,21 +34,19 @@ PROBLEM3/
 │   │   └── routes/
 │   │       ├── __init__.py 
 │   │       ├── items.py ## all the api end points have been done here
-│   │       ├── login.py # logged in user password reset , register user ,reset password token based authentication has been implemneted here
-│   │       ├── private.py # creating private users
-│   │       ├── users.py # all the crud operations in terms of the user has been used
 │   │       └── utils.py
+                 main.py # where the routing has been finallly done
 │   ├── __init__.py
 │   ├── deps.py # Database Session Management,OAuth2 Setup,Current User Authentication,Superuser Check, superuser privileges
 │   ├── main.py
 │   └── core/
 │       ├── config.py #CORS (Cross-Origin Resource Sharing) Configuration,Handles CORS origins ,Validates URLs for CORS
 │       ├── db.py # initializes the DB
-│       └── security.py
+│       └── security.py # getting the password hash,veryfying the password and getting the algorithm via"HS256" algo
 ├── tests/
 │   ├── api/
 │   ├── crud/
-│   ├── scripts/
+│   ├── scripts/    #trying to write the tests of all the features that have been implemented
 │   ├── utils/
 │   ├── __init__.py
 │   └── conftest.py
@@ -78,11 +69,10 @@ PROBLEM3/
 ├── README.md
 ├── README.MD
 └── tests-start.sh
-![alt text](image-1.png)
- 
 
 
-##  I have tried to write the tests for each and every feature implemented 
+
+* Now we can open wer browser and interact with these URLs:
 
 Frontend, built with Docker, with routes handled based on the path: http://localhost:5173
 
@@ -95,16 +85,16 @@ Adminer, database web administration: http://localhost:8080
 
 
 
-## Local Development
 
-The Docker Compose files are configured so that each of the services is available in a different port in `localhost`.
+```
 
+Or we could stop the `backend` Docker Compose service:
 
-This way, you could turn off a Docker Compose service and start its local development service, and everything would keep working, because it all uses the same ports.
+```bash
+docker compose stop backend
+```
 
-
-
-And then you can run the local development server for the backend:
+And then we can run the local development server for the backend:
 
 ```bash
 cd backend
@@ -112,51 +102,49 @@ fastapi dev app/main.py
 ```
 
 
-## Docker Compose files and env vars
-
 
 ## The .env file
 
-The `.env` file is the one that contains all your configurations, generated keys and passwords, etc.
+The `.env` file is the one that contains all wer configurations, generated keys and passwords, etc.
 
-Depending on your workflow, you could want to exclude it from Git, for example if your project is public. In that case, you would have to make sure to set up a way for your CI tools to obtain it while building or deploying your project.
+Depending on wer workflow, we could want to exclude it from Git, for example if wer project is public. In that case, we would have to make sure to set up a way for wer CI tools to obtain it while building or deploying wer project.
 
-One way to do it could be to add each environment variable to your CI/CD system, and updating the `docker-compose.yml` file to read that specific env var instead of reading the `.env` file.
+One way to do it could be to add each environment variable to wer CI/CD system, and updating the `docker-compose.yml` file to read that specific env var instead of reading the `.env` file.
 
 ## Pre-commits and code linting
 
 we are using a tool called [pre-commit](https://pre-commit.com/) for code linting and formatting.
 
-When you install it, it runs right before making a commit in git. This way it ensures that the code is consistent and formatted even before it is committed.
+When we install it, it runs right before making a commit in git. This way it ensures that the code is consistent and formatted even before it is committed.
 
-You can find a file `.pre-commit-config.yaml` with configurations at the root of the project.
+we can find a file `.pre-commit-config.yaml` with configurations at the root of the project.
 
 #### Install pre-commit to run automatically
 
-`pre-commit` is already part of the dependencies of the project, but you could also install it globally if you prefer to, following [the official pre-commit docs](https://pre-commit.com/).
+`pre-commit` is already part of the dependencies of the project, but we could also install it globally if we prefer to, following [the official pre-commit docs](https://pre-commit.com/).
 
-After having the `pre-commit` tool installed and available, you need to "install" it in the local repository, so that it runs automatically before each commit.
+After having the `pre-commit` tool installed and available, we need to "install" it in the local repository, so that it runs automatically before each commit.
 
-Using `uv`, you could do it with:
+Using `uv`, we could do it with:
 
 ```bash
 ❯ uv run pre-commit install
 pre-commit installed at .git/hooks/pre-commit
 ```
 
-Now whenever you try to commit, e.g. with:
+Now whenever we try to commit, e.g. with:
 
 ```bash
 git commit
 ```
 
-...pre-commit will run and check and format the code you are about to commit, and will ask you to add that code (stage it) with git again before committing.
+...pre-commit will run and check and format the code we are about to commit, and will ask we to add that code (stage it) with git again before committing.
 
-Then you can `git add` the modified/fixed files again and now you can commit.
+Then we can `git add` the modified/fixed files again and now we can commit.
 
 #### Running pre-commit hooks manually
 
-you can also run `pre-commit` manually on all the files, you can do it using `uv` with:
+we can also run `pre-commit` manually on all the files, we can do it using `uv` with:
 
 ```bash
 ❯ uv run pre-commit run --all-files
@@ -169,11 +157,9 @@ eslint...................................................................Passed
 prettier.................................................................Passed
 ```
 
-
-
 ## URLs
 
-The production or staging URLs would use these same paths, but with your own domain.
+The production or staging URLs would use these same paths, but with wer own domain.
 
 ### Development URLs
 
@@ -183,5 +169,5 @@ Backend: http://localhost:8000
 
 Automatic Interactive Docs (Swagger UI): http://localhost:8000/docs
 
-
-so repository pattern has een used to solve this
+## Scope of Improvement 
+The tests writing are still under progress and have not been fully implemened for all the features due to time constaints
